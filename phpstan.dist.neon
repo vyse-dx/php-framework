@@ -1,0 +1,39 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/vyse/toolchain/rules.neon
+    
+parameters:
+    bootstrapFiles:
+        - vendor/autoload.php
+
+    level: 10
+
+    paths:
+        - src
+        - test
+
+    tmpDir: .cache/phpstan
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        -
+            identifier: property.unresolvableNativeType
+            path: test/*
+        -
+            identifier: method.unresolvableReturnType
+            path: test/*
+        -
+            identifier: staticMethod.unresolvableReturnType
+            path: test/*
+        -
+            identifier: method.nonObject
+            message: '#Cannot call method (willReturn|method|expects)\(\) on mixed#'
+            path: test/*
+        - 
+            identifier: phpunit.callParent
+            path: tests/Data/Repository/*Test.php

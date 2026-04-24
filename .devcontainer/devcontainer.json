@@ -1,0 +1,32 @@
+{
+  "name": "Vyse Framework",
+  "image": "ghcr.io/vyse-dx/devcontainer:latest",
+  "remoteUser": "ubuntu",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "junstyle.php-cs-fixer",
+        "emeraldwalk.RunOnSave"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "[php]": {
+          "editor.defaultFormatter": "junstyle.php-cs-fixer"
+        },
+        "php-cs-fixer.executablePath": "${workspaceFolder}/vendor/bin/php-cs-fixer",
+        "php-cs-fixer.config": ".php-cs-fixer.php",
+        "php-cs-fixer.rules": "@config",
+        "php-cs-fixer.allowRisky": true,
+        "emeraldwalk.runonsave": {
+          "commands": [
+            {
+              "match": "test/.*\\.php$",
+              "isAsync": false,
+              "cmd": "vendor/bin/rector process ${file} --config=rector-fast.php --clear-cache --debug"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

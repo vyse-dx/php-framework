@@ -1,0 +1,78 @@
+services:
+  dev:
+    image: ghcr.io/vyse-dx/devcontainer:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    profiles:
+      - dev
+    user: ubuntu
+    volumes:
+      - .:/workspace
+
+  test:
+    image: ghcr.io/vyse-dx/devcontainer:latest
+    depends_on:
+      test-database:
+        condition: service_healthy
+    profiles:
+      - test
+    user: ubuntu
+    volumes:
+      - .:/workspace
+
+  frankenphp:
+    build:
+      context: ./docker/web
+      dockerfile: Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      APP_ENV: dev
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./:/app
+      - caddy_data:/data
+      - caddy_config:/config
+
+  database:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: app
+      PGDATA: /var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  test-database:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - test
+    tmpfs:
+      - /var/lib/postgresql
+
+volumes:
+  caddy_config:
+  caddy_data:
+  database_data:
