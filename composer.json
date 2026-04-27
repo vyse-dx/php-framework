@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Vyse\\Framework\\": "src"
+            "Vyse\\Framework\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\": "app"
+            "App\\": "app/"
         }
     },
     "authors": [
