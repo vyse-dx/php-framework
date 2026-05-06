@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Vyse\Framework\Test\Integration\Responder;
+namespace Test\Integration\Symfony\Responder;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Twig\Environment;

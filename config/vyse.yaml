@@ -5,3 +5,8 @@ services:
 
     Vyse\Framework\:
         resource: '../src/'
+
+    Vyse\Framework\Twig\Compiler\ComponentSyntaxLoader:
+        decorates: 'twig.loader.native_filesystem'
+        arguments:
+            $innerLoader: '@.inner'
