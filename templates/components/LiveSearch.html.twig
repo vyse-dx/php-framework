@@ -1,0 +1,65 @@
+{# templates/components/LiveSearch.html.twig #}
+
+{% set placeholder = placeholder|default('Search...') %}
+{% set name = name|default('q') %}
+{% set id = id|default('search-' ~ random()) %}
+{% set endpoint = endpoint|default('/api/search') %}
+
+<div class="relative w-full max-w-md font-sans" x-data="{ query: '', isOpen: false }">
+    
+    <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg width="20" height="20" class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        
+        {# 
+           HTMX Attributes added below Alpine attributes. 
+           It listens to the input, waits 500ms, and pushes the result to the <ul>.
+        #}
+        <Input 
+            id="{{ id }}"
+            name="{{ name }}"
+            type="search"
+            placeholder="{{ placeholder }}"
+            @model="query"
+            @focus="isOpen = true"
+            @click.outside="isOpen = false"
+            @ref="searchInput"
+            @get="{{ endpoint }}"
+            @trigger="input changed delay:500ms, search"
+            @target="#{{ id }}-results"
+            class="pl-10 pr-10 [&::-webkit-search-cancel-button]:hidden"
+        />
+
+        <button 
+            type="button"
+            x-show="query.length > 0"
+            @click="query = ''; $refs.searchInput.focus()"
+            style="display: none;"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+        >
+            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+        </button>
+    </div>
+
+    <div 
+        x-show="isOpen" 
+        x-transition
+        style="display: none;" 
+        class="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+    >
+        {# 
+           Target container for HTMX. 
+           We use the dynamic ID so multiple search boxes don't conflict. 
+        #}
+        <ul id="{{ id }}-results" class="max-h-60 overflow-auto rounded-md py-1 text-base sm:text-sm">
+            <li class="relative cursor-default select-none py-2 px-4 text-sm text-gray-500 italic">
+                Awaiting backend...
+            </li>
+        </ul>
+    </div>
+</div>

@@ -11,18 +11,20 @@ use Vyse\Framework\Twig\Compiler\Pass\ComponentTagConversionPass;
 use Vyse\Framework\Twig\Compiler\Pass\NamedSlotDefinitionPass;
 use Vyse\Framework\Twig\Compiler\Pass\RootAttributeInjectionPass;
 use Vyse\Framework\Twig\Compiler\Pass\SlotOutputResolutionPass;
+use Vyse\Framework\Twig\Compiler\Pass\SmartDirectivePass;
 use Vyse\Framework\Twig\Compiler\Pass\TailwindAttributeMergePass;
 
 class ComponentSyntaxLoader implements LoaderInterface
 {
     public function __construct(
         private LoaderInterface $innerLoader,
-        private ComponentTagConversionPass $tagConversionPass = new ComponentTagConversionPass(),
-        private NamedSlotDefinitionPass $slotDefinitionPass = new NamedSlotDefinitionPass(),
-        private RootAttributeInjectionPass $rootInjectionPass = new RootAttributeInjectionPass(),
-        private SlotOutputResolutionPass $slotResolutionPass = new SlotOutputResolutionPass(),
-        private TailwindAttributeMergePass $tailwindMergePass = new TailwindAttributeMergePass(),
-        private ComponentAttributeForwardingPass $attributeForwardingPass = new ComponentAttributeForwardingPass(),
+        private ComponentTagConversionPass $tagConversionPass = new ComponentTagConversionPass,
+        private NamedSlotDefinitionPass $slotDefinitionPass = new NamedSlotDefinitionPass,
+        private RootAttributeInjectionPass $rootInjectionPass = new RootAttributeInjectionPass,
+        private SlotOutputResolutionPass $slotResolutionPass = new SlotOutputResolutionPass,
+        private TailwindAttributeMergePass $tailwindMergePass = new TailwindAttributeMergePass,
+        private ComponentAttributeForwardingPass $attributeForwardingPass = new ComponentAttributeForwardingPass,
+        private SmartDirectivePass $smartDirectivePass = new SmartDirectivePass,
     ) {
     }
 
@@ -35,6 +37,7 @@ class ComponentSyntaxLoader implements LoaderInterface
 
         $code = ($this->tagConversionPass)($code);
         $code = ($this->slotDefinitionPass)($code);
+        $code = ($this->smartDirectivePass)($code);
 
         if ($isComponent) {
             $code = ($this->rootInjectionPass)($code);

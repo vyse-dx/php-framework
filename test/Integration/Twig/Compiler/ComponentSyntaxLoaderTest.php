@@ -61,34 +61,36 @@ class ComponentSyntaxLoaderTest extends IntegrationTestCase
 
     public function testItOnlyAppliesGlobalPassesToStandardTemplates(): void
     {
-        // 1. <Submit> should become <twig:Submit> (ComponentTagConversionPass - Global)
-        // 2. <slot:header> should become {% block header %} (NamedSlotDefinitionPass - Global)
-        // 3. class="flex" {{ attributes }} should REMAIN UNTOUCHED (TailwindAttributeMergePass - Component Only)
-        $rawHtml = '<slot:header>Title</slot:header><div class="flex" {{ attributes }}><Submit>Send</Submit></div>';
+        // 1. <Submit> should become <twig:Submit> (ComponentTagConversionPass - Global)[cite: 13]
+        // 2. <slot:header> should become {% block header %} (NamedSlotDefinitionPass - Global)[cite: 13]
+        // 3. @model="test" should become x-model="test" (SmartDirectivePass - Global)
+        // 4. class="flex" {{ attributes }} should REMAIN UNTOUCHED (TailwindAttributeMergePass - Component Only)[cite: 13]
+        $rawHtml = '<slot:header>Title</slot:header><div @model="test" class="flex" {{ attributes }}><Submit>Send</Submit></div>';
         $originalSource = new Source($rawHtml, 'pages/home.html.twig', '');
 
         $this->innerLoaderMock->method('getSourceContext')->willReturn($originalSource);
 
         $source = $this->loader->getSourceContext('pages/home.html.twig');
 
-        // Notice how the <div> attributes are not merged, proving component passes were skipped
-        $expected = '{% block header %}Title{% endblock %}<div class="flex" {{ attributes }}><twig:Submit>Send</twig:Submit></div>';
+        // Notice how the <div> attributes are not merged, but @model is translated[cite: 13]
+        $expected = '{% block header %}Title{% endblock %}<div x-model="test" class="flex" {{ attributes }}><twig:Submit>Send</twig:Submit></div>';
 
         self::assertSame($expected, $source->getCode());
     }
 
     public function testItAppliesAllPassesForComponentTemplates(): void
     {
-        // All passes run, including component-specific ones like TailwindAttributeMergePass
-        $rawHtml = '<slot:header>Title</slot:header><div class="flex" {{ attributes }}><Submit>Send</Submit></div>';
+        // All passes run, including component-specific ones like TailwindAttributeMergePass[cite: 13]
+        // We added @get to prove the SmartDirectivePass still fires before the component passes[cite: 13]
+        $rawHtml = '<slot:header>Title</slot:header><div @get="/api" class="flex" {{ attributes }}><Submit>Send</Submit></div>';
         $originalSource = new Source($rawHtml, 'components/test.html.twig', '');
 
         $this->innerLoaderMock->method('getSourceContext')->willReturn($originalSource);
 
         $source = $this->loader->getSourceContext('components/test.html.twig');
 
-        // Notice how `class="flex" {{ attributes }}` is fully transformed into Tailwind merge logic
-        $expected = '{% block header %}Title{% endblock %}<div class="{{ (\'flex\' ~ \' \' ~ attributes.render(\'class\'))|tailwind_merge|trim }}" {{ attributes }}><twig:Submit>Send</twig:Submit></div>';
+        // Notice how @get is translated to hx-get, and the class is fully transformed into Tailwind merge logic[cite: 13]
+        $expected = '{% block header %}Title{% endblock %}<div hx-get="/api" class="{{ (\'flex\' ~ \' \' ~ attributes.render(\'class\'))|tailwind_merge|trim }}" {{ attributes }}><twig:Submit>Send</twig:Submit></div>';
 
         self::assertSame($expected, $source->getCode());
     }
