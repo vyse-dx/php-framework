@@ -1,3 +1,5 @@
-<Button type="submit">
+{% props variant = 'default', size = 'default' %}
+
+<Button type="submit" variant="{{ variant }}" size="{{ size }}">
     {{ slots.default }}
 </Button>

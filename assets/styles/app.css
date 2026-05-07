@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-    /* Mapping semantic names to CSS variables */
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-muted-foreground: var(--muted-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
 }
 
 :root {
@@ -17,6 +19,9 @@
     --border: #e4e4e7;
     --input: #e4e4e7;
     --ring: #18181b;
+
+    --primary: #2563eb;
+    --primary-foreground: #ffffff;
 }
 
 .dark {
@@ -26,4 +31,7 @@
     --border: #27272a;
     --input: #27272a;
     --ring: #d4d4d8;
+
+    --primary: #3b82f6;
+    --primary-foreground: #09090b;
 }
